@@ -1,0 +1,20 @@
+<div class="row">
+  <div class="col-xs-12" *ngIf="recipes.length > 0">
+    <div class="list-group">
+      <app-recipe-item
+        *ngFor="let recipeEl of pagedRecipes"
+        [recipe]="recipeEl"
+      ></app-recipe-item>
+    </div>
+    <ngb-pagination
+      [collectionSize]="recipes.length"
+      [maxSize]="5"
+      [rotate]="true"
+      [(page)]="page"
+      aria-label="Default pagination"
+      (pageChange)="onPageChange($event)"
+    >
+      ></ngb-pagination
+    >
+  </div>
+</div>
