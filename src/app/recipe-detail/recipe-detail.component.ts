@@ -3,6 +3,7 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
+import { Location } from '@angular/common';
 
 import { Recipe } from '../models/recipe.model';
 import * as fromApp from '../store/app.reducer';
@@ -16,12 +17,14 @@ import { slugify } from '../utils';
 export class RecipeDetailComponent implements OnInit, OnDestroy {
   public recipe: Recipe;
   public id: string;
+  public imageSrc: string;
   private subs: Subscription[] = [];
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private store: Store<fromApp.AppState>
+    private store: Store<fromApp.AppState>,
+    private location: Location
   ) {}
 
   ngOnInit() {
@@ -43,10 +46,18 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
             );
           })
         )
-        .subscribe((recipe) => (this.recipe = recipe)),
+        .subscribe((recipe) => {
+          this.recipe = recipe;
+          console.log(this.recipe);
+          this.imageSrc = `/assets/images/${encodeURIComponent(
+            recipe.imageName
+          )}`;
+        }),
     ];
   }
-
+  back(): void {
+    this.location.back();
+  }
   ngOnDestroy() {
     this.subs.forEach((sub) => sub.unsubscribe());
   }

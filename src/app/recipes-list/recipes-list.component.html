@@ -1,5 +1,19 @@
+<div class="row mb-5">
+  <div class="col-12">
+    <form [formGroup]="searchForm">
+      <input
+        type="text"
+        class="form-control"
+        id="searchInput"
+        aria-describedby="Ricerca ricette"
+        placeholder="Cerca una ricetta"
+        formControlName="searchInput"
+      />
+    </form>
+  </div>
+</div>
 <div class="row">
-  <div class="col-xs-12" *ngIf="recipes.length > 0">
+  <div class="col-12" *ngIf="recipes.length > 0">
     <div class="list-group">
       <app-recipe-item
         *ngFor="let recipeEl of pagedRecipes"

@@ -18,6 +18,7 @@ import { RecipeEffects } from './store/recipe.effects';
 import { environment } from 'src/environments/environment';
 import { RecipeItemComponent } from './recipe-item/recipe-item.component';
 import { RecipeDetailComponent } from './recipe-detail/recipe-detail.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 // import { initializeApp } from 'firebase/app';
 @NgModule({
@@ -32,6 +33,7 @@ import { RecipeDetailComponent } from './recipe-detail/recipe-detail.component';
     AppRoutingModule,
     NgbModule,
     HttpClientModule,
+    ReactiveFormsModule,
     StoreModule.forRoot(fromApp.appReducer),
     EffectsModule.forRoot([RecipeEffects]),
     StoreDevtoolsModule.instrument({ logOnly: environment.production }),
