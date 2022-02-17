@@ -59,13 +59,17 @@ export class RecipeEffects {
     );
   });
 
-  @Effect({ dispatch: false })
-  storeRecipes = this.actions$.pipe(
-    ofType(RecipesActions.STORE_RECIPES),
-    withLatestFrom(this.store.select('recipes')),
-    switchMap(([actionData, recipesState]) => {
-      return this.http.put(`${baseApi}/recipes.json`, recipesState.recipes);
-    })
+  storeRecipes$ = createEffect(
+    () => {
+      return this.actions$.pipe(
+        ofType(RecipesActions.STORE_RECIPES),
+        withLatestFrom(this.store.select('recipes')),
+        switchMap(([actionData, recipesState]) => {
+          return this.http.put(`${baseApi}/recipes.json`, recipesState.recipes);
+        })
+      );
+    },
+    { dispatch: false }
   );
 
   authLogin$ = createEffect(() => {
