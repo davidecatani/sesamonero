@@ -20,6 +20,7 @@ import { RecipeDetailComponent } from './recipe-detail/recipe-detail.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CoreModule } from './core.module';
 import * as fromApp from './store/app.reducer';
+import { Nl2brPipe } from './pipes/nl2br.pipe';
 
 // import { initializeApp } from 'firebase/app';
 @NgModule({
@@ -28,6 +29,7 @@ import * as fromApp from './store/app.reducer';
     RecipesListComponent,
     RecipeItemComponent,
     RecipeDetailComponent,
+    Nl2brPipe,
   ],
   imports: [
     BrowserModule,

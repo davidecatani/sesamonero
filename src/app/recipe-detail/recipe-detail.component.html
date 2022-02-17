@@ -5,75 +5,77 @@
     </button>
   </div>
 </div>
-<div class="row flex-column-reverse flex-sm-row mb-3">
-  <div class="col-12 col-sm-6">
-    <h1>{{ recipe.title }}</h1>
-    <ul class="list-group">
-      <li
-        class="list-group-item d-flex justify-content-between align-items-center"
-        *ngIf="recipe.difficulty"
-      >
-        Difficoltà
-        <span class="badge badge-secondary badge-pill">{{
-          recipe.difficulty
-        }}</span>
-      </li>
-      <li
-        class="list-group-item d-flex justify-content-between align-items-center"
-        *ngIf="recipe.preparationTime"
-      >
-        Tempo di preparazione
-        <span class="badge badge-secondary badge-pill">{{
-          recipe.preparationTime
-        }}</span>
-      </li>
-      <li
-        class="list-group-item d-flex justify-content-between align-items-center"
-        *ngIf="recipe.cookingTime"
-      >
-        Tempo di cottura
-        <span class="badge badge-secondary badge-pill">{{
-          recipe.cookingTime
-        }}</span>
-      </li>
-      <li
-        class="list-group-item d-flex justify-content-between align-items-center"
-        *ngIf="recipe.portions"
-      >
-        Porzioni
-        <span class="badge badge-secondary badge-pill">{{
-          recipe.portions
-        }}</span>
-      </li>
-    </ul>
-  </div>
-  <div class="col-12 col-sm-6 mb-3 mb-sm-0">
-    <img [src]="imageSrc" alt="{{ recipe.title }}" class="img-fluid" />
-  </div>
-</div>
-<div class="row mb-3" *ngIf="recipe.intro">
-  <div class="col-12">
-    {{ recipe.intro }}
-  </div>
-</div>
-<div class="row mb-3">
-  <div class="col-12">
-    <ul class="list-group">
-      <li
-        class="list-group-item d-flex align-items-center"
-        *ngFor="let ingredient of recipe.ingredients"
-      >
-        {{ ingredient.ingredient }}
-        {{ ingredient.quantity }} {{ ingredient.unityOfMeasure }}
-        <ng-container *ngIf="ingredient.note"
-          >({{ ingredient.note }})</ng-container
+<ng-container *ngIf="!!recipe">
+  <div class="row flex-column-reverse flex-sm-row mb-3">
+    <div class="col-12 col-sm-6">
+      <h1>{{ recipe.title }}</h1>
+      <ul class="list-group">
+        <li
+          class="list-group-item d-flex justify-content-between align-items-center"
+          *ngIf="recipe.difficulty"
         >
-      </li>
-    </ul>
+          Difficoltà
+          <span class="badge badge-secondary badge-pill">{{
+            recipe.difficulty
+          }}</span>
+        </li>
+        <li
+          class="list-group-item d-flex justify-content-between align-items-center"
+          *ngIf="recipe.preparationTime"
+        >
+          Tempo di preparazione
+          <span class="badge badge-secondary badge-pill">{{
+            recipe.preparationTime
+          }}</span>
+        </li>
+        <li
+          class="list-group-item d-flex justify-content-between align-items-center"
+          *ngIf="recipe.cookingTime"
+        >
+          Tempo di cottura
+          <span class="badge badge-secondary badge-pill">{{
+            recipe.cookingTime
+          }}</span>
+        </li>
+        <li
+          class="list-group-item d-flex justify-content-between align-items-center"
+          *ngIf="recipe.portions"
+        >
+          Porzioni
+          <span class="badge badge-secondary badge-pill">{{
+            recipe.portions
+          }}</span>
+        </li>
+      </ul>
+    </div>
+    <div class="col-12 col-sm-6 mb-3 mb-sm-0">
+      <img [src]="imageSrc" alt="{{ recipe.title }}" class="img-fluid" />
+    </div>
   </div>
-</div>
-<div class="row mb-3">
-  <div class="col-12">
-    {{ recipe.description }}
+  <div class="row mb-3" *ngIf="recipe.intro">
+    <div class="col-12">
+      {{ recipe.intro }}
+    </div>
   </div>
-</div>
+  <div class="row mb-3">
+    <div class="col-12">
+      <ul class="list-group">
+        <li
+          class="list-group-item d-flex align-items-center"
+          *ngFor="let ingredient of recipe.ingredients"
+        >
+          {{ ingredient.ingredient }}
+          {{ ingredient.quantity }} {{ ingredient.unityOfMeasure }}
+          <ng-container *ngIf="ingredient.note"
+            >({{ ingredient.note }})</ng-container
+          >
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-12">
+      <p [innerHTML]="recipe.description | nl2br"></p>
+    </div>
+  </div>
+</ng-container>

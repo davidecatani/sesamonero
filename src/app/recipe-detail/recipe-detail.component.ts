@@ -48,10 +48,12 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
         )
         .subscribe((recipe) => {
           this.recipe = recipe;
-          // console.log(this.recipe);
-          this.imageSrc = `/assets/images/${encodeURIComponent(
-            recipe.imageName
-          )}`;
+          console.log(this.recipe.description);
+          if (recipe) {
+            this.imageSrc = `/assets/images/${encodeURIComponent(
+              recipe.imageName
+            )}`;
+          }
         }),
     ];
   }
