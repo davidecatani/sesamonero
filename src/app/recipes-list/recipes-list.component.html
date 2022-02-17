@@ -6,8 +6,11 @@
         class="form-control"
         id="searchInput"
         aria-describedby="Ricerca ricette"
+        autocomplete="off"
+        autofill="off"
         placeholder="Cerca una ricetta"
         formControlName="searchInput"
+        #searchInput
       />
     </form>
   </div>
@@ -22,7 +25,7 @@
     </div>
     <ngb-pagination
       [collectionSize]="recipes.length"
-      [maxSize]="5"
+      [maxSize]="10"
       [rotate]="true"
       [(page)]="page"
       aria-label="Default pagination"

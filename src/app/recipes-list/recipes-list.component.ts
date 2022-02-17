@@ -1,4 +1,11 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { map, Subscription } from 'rxjs';
 import { Recipe } from '../models/recipe.model';
@@ -12,7 +19,7 @@ import * as fromApp from '../store/app.reducer';
   templateUrl: './recipes-list.component.html',
   styleUrls: ['./recipes-list.component.scss'],
 })
-export class RecipesListComponent implements OnInit, OnDestroy {
+export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
   public recipes: Recipe[];
   public fullRecipes: Recipe[];
   public pagedRecipes: Recipe[];
@@ -22,6 +29,8 @@ export class RecipesListComponent implements OnInit, OnDestroy {
   public searchForm: FormGroup;
   public searchQuery: string;
   private subs: Subscription[] = [];
+
+  @ViewChild('searchInput') searchInput: ElementRef;
 
   constructor(
     private route: ActivatedRoute,
@@ -65,6 +74,9 @@ export class RecipesListComponent implements OnInit, OnDestroy {
         );
         this.navigate();
       });
+  }
+  ngAfterViewInit() {
+    this.searchInput.nativeElement.focus();
   }
 
   navigate() {
