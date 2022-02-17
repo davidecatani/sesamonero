@@ -13,12 +13,13 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { RecipesListComponent } from './recipes-list/recipes-list.component';
-import * as fromApp from './store/app.reducer';
-import { RecipeEffects } from './store/recipe.effects';
+import { RecipeEffects } from './store/recipes/recipe.effects';
 import { environment } from 'src/environments/environment';
 import { RecipeItemComponent } from './recipe-item/recipe-item.component';
 import { RecipeDetailComponent } from './recipe-detail/recipe-detail.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { CoreModule } from './core.module';
+import * as fromApp from './store/app.reducer';
 
 // import { initializeApp } from 'firebase/app';
 @NgModule({
@@ -37,6 +38,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     StoreModule.forRoot(fromApp.appReducer),
     EffectsModule.forRoot([RecipeEffects]),
     StoreDevtoolsModule.instrument({ logOnly: environment.production }),
+    CoreModule,
     // AngularFireModule.initializeApp(environment.firebase),
     // AngularFireDatabaseModule,
     // AngularFireStorageModule,

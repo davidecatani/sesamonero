@@ -37,7 +37,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
           }),
           switchMap((id) => {
             this.id = id ? id : '1';
-            console.log(this.id, id);
+            //  console.log(this.id, id);
             return this.store.select('recipes');
           }),
           map((recipeState) => {
@@ -48,7 +48,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
         )
         .subscribe((recipe) => {
           this.recipe = recipe;
-          console.log(this.recipe);
+          // console.log(this.recipe);
           this.imageSrc = `/assets/images/${encodeURIComponent(
             recipe.imageName
           )}`;

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 
-import * as RecipesActions from './store/recipe.actions';
+import * as RecipesActions from './store/recipes/recipe.actions';
+import * as fromApp from './store/app.reducer';
 
 @Component({
   selector: 'app-root',
@@ -11,8 +12,9 @@ import * as RecipesActions from './store/recipe.actions';
 export class AppComponent implements OnInit {
   title = 'sesamonero';
 
-  constructor(private store: Store) {}
+  constructor(private store: Store<fromApp.AppState>) {}
   ngOnInit(): void {
+    this.store.dispatch(new RecipesActions.AnonymousLogin());
     this.store.dispatch(new RecipesActions.FetchRecipes());
   }
 }

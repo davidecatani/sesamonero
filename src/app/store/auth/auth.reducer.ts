@@ -1,23 +1,23 @@
-import { Recipe } from '../models/recipe.model';
-import * as RecipesActions from './recipe.actions';
+import * as RecipesActions from '../recipes/recipe.actions';
 
 export interface State {
-  recipes: Recipe[];
+  token: string;
 }
 
 const initialState: State = {
-  recipes: [],
+  token: null,
 };
 
-export function recipeReducer(
+export function authReducer(
   state = initialState,
   action: RecipesActions.RecipesActions
 ): State {
+  // console.log(action);
   switch (action.type) {
-    case RecipesActions.SET_RECIPES:
+    case RecipesActions.SET_TOKEN:
       return {
         ...state,
-        recipes: [...action.payload],
+        token: action.payload,
       };
     default:
       return { ...state };
