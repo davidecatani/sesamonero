@@ -24,7 +24,7 @@ export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
   public fullRecipes: Recipe[];
   public pagedRecipes: Recipe[];
   public page: number;
-  public pageSize = 10;
+  public pageSize = 12;
   public total = 10000;
   public searchForm: FormGroup;
   public searchQuery: string;

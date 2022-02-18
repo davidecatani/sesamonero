@@ -1,17 +1,12 @@
 <a
-  class="list-group-item list-group-item-action flex-column align-items-start"
+  class="list-group-item list-group-item-action flex-column align-items-start recipe-item"
   routerLinkActive="active"
   [routerLink]="[detailUrl]"
 >
-  <div class="pull-left">
+  <div class="inner">
+    <div class="img-wrapper">
+      <img [src]="imageSrc" alt="{{ recipe.title }}" class="img-fluid" />
+    </div>
     <h4 class="list-group-item-heading" [innerHtml]="recipe.title"></h4>
   </div>
-  <span class="pull-right">
-    <img
-      [src]="imageSrc"
-      alt="{{ recipe.title }}"
-      class="img-thumbnail"
-      style="max-height: 50px"
-    />
-  </span>
 </a>

@@ -3,7 +3,7 @@
     <form [formGroup]="searchForm">
       <input
         type="text"
-        class="form-control"
+        class="form-control search-input"
         id="searchInput"
         aria-describedby="Ricerca ricette"
         autocomplete="off"
@@ -17,7 +17,7 @@
 </div>
 <div class="row">
   <div class="col-12" *ngIf="recipes.length > 0">
-    <div class="list-group">
+    <div class="list-group recipes-list mb-5 flex-row flex-wrap">
       <app-recipe-item
         *ngFor="let recipeEl of pagedRecipes"
         [recipe]="recipeEl"
@@ -25,7 +25,8 @@
     </div>
     <ngb-pagination
       [collectionSize]="recipes.length"
-      [maxSize]="10"
+      [pageSize]="pageSize"
+      [maxSize]="9"
       [rotate]="true"
       [(page)]="page"
       aria-label="Default pagination"
