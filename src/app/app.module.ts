@@ -17,6 +17,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { CoreModule } from './core.module';
 import * as fromApp from './store/app.reducer';
 import { Nl2brPipe } from './pipes/nl2br.pipe';
+import { RemoveBracketsPipe } from './pipes/removeBrackets.pipe';
 
 // import { initializeApp } from 'firebase/app';
 @NgModule({
@@ -26,6 +27,7 @@ import { Nl2brPipe } from './pipes/nl2br.pipe';
     RecipeItemComponent,
     RecipeDetailComponent,
     Nl2brPipe,
+    RemoveBracketsPipe,
   ],
   imports: [
     BrowserModule,

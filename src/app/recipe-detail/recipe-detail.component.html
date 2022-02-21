@@ -68,7 +68,7 @@
           {{ ingredient.ingredient }}
           {{ ingredient.quantity }} {{ ingredient.unityOfMeasure }}
           <ng-container *ngIf="ingredient.note"
-            >({{ ingredient.note }})</ng-container
+            >({{ ingredient.note | removeBrackets }})</ng-container
           >
         </li>
       </ul>
