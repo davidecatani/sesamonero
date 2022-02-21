@@ -78,7 +78,7 @@ export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
       });
   }
   ngAfterViewInit() {
-    this.searchInput.nativeElement.focus();
+    // this.searchInput.nativeElement.focus();
   }
 
   navigate() {
