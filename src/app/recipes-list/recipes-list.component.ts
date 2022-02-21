@@ -7,12 +7,13 @@ import {
   AfterViewInit,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { map, Subscription } from 'rxjs';
+import { map, Subscription, take } from 'rxjs';
 import { Recipe } from '../models/recipe.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormControl, FormGroup } from '@angular/forms';
 
 import * as fromApp from '../store/app.reducer';
+import { SetCurrentSearch, SetPage } from '../store/general/general.actions';
 
 @Component({
   selector: 'app-recipes-list',
@@ -21,9 +22,9 @@ import * as fromApp from '../store/app.reducer';
 })
 export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
   public isLoading = true;
-  public recipes: Recipe[];
-  public fullRecipes: Recipe[];
-  public pagedRecipes: Recipe[];
+  public recipes: Recipe[] = [];
+  public fullRecipes: Recipe[] = [];
+  public pagedRecipes: Recipe[] = [];
   public page: number;
   public pageSize = 12;
   public total = 10000;
@@ -38,14 +39,26 @@ export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
     private router: Router,
     private store: Store<fromApp.AppState>
   ) {
-    this.searchQuery = '';
+    // this.searchQuery = '';
   }
 
   ngOnInit() {
     this.formInit();
+    this.recipesFilter();
     this.page = this.route.snapshot.paramMap.get('pageNumber')
       ? +this.route.snapshot.paramMap.get('pageNumber')
       : 1;
+
+    this.store.dispatch(new SetPage(this.page));
+
+    this.store
+      .select('general')
+      .pipe(take(1))
+      .subscribe((general) => {
+        this.searchQuery = general.currentSearch;
+        this.searchForm.setValue({ searchInput: this.searchQuery });
+        this.recipesFilter();
+      });
 
     this.subs = [
       ...this.subs,
@@ -57,28 +70,40 @@ export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
         .select('recipes')
         .pipe(map((recipesState) => recipesState.recipes))
         .subscribe((updatedRecipes: Recipe[]) => {
-          this.isLoading = false;
-          this.recipes = updatedRecipes;
-          this.fullRecipes = updatedRecipes;
-          this.navigate();
+          if (updatedRecipes.length !== this.fullRecipes.length) {
+            this.isLoading = false;
+            // this.recipes = updatedRecipes;
+            this.fullRecipes = updatedRecipes;
+            this.recipesFilter();
+          }
         }),
     ];
     this.searchForm
       .get('searchInput')
       .valueChanges.subscribe((selectedValue) => {
-        const re = new RegExp(selectedValue, 'i');
-        this.recipes = this.fullRecipes.filter(
-          (recipe) =>
-            recipe.title.match(re) ||
-            recipe.ingredients.some((ingredient) =>
-              ingredient.ingredient.match(re)
-            )
-        );
-        this.navigate();
+        this.store.dispatch(new SetCurrentSearch(selectedValue));
+        this.searchQuery = selectedValue;
+        this.recipesFilter();
       });
   }
   ngAfterViewInit() {
     // this.searchInput.nativeElement.focus();
+  }
+
+  recipesFilter(): void {
+    const re = new RegExp(this.searchQuery, 'i');
+    if (Boolean(this.searchQuery)) {
+      this.recipes = this.fullRecipes.filter(
+        (recipe) =>
+          recipe.title.match(re) ||
+          recipe.ingredients.some((ingredient) =>
+            ingredient.ingredient.match(re)
+          )
+      );
+    } else {
+      this.recipes = this.fullRecipes;
+    }
+    this.navigate();
   }
 
   navigate() {
@@ -98,6 +123,7 @@ export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onPageChange(event) {
     this.router.navigate([`../${this.page}`], { relativeTo: this.route });
+    this.store.dispatch(new SetPage(this.page));
   }
   ngOnDestroy(): void {
     this.subs.forEach((sub) => sub.unsubscribe());

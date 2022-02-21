@@ -13,7 +13,6 @@ export function recipeReducer(
   state = initialState,
   action: RecipesActions.RecipesActions
 ): State {
-  // console.log(action);
   switch (action.type) {
     case RecipesActions.SET_RECIPES:
       return {

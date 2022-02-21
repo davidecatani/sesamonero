@@ -18,6 +18,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   public recipe: Recipe;
   public id: string;
   public imageSrc: string;
+  public currentPage: number;
   private subs: Subscription[] = [];
 
   constructor(
@@ -30,6 +31,10 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.subs = [
       ...this.subs,
+      this.store.select('general').subscribe((data) => {
+        this.currentPage = data.currentPage ? data.currentPage : 1;
+        console.log(data);
+      }),
       this.route.params
         .pipe(
           map((params) => {
@@ -58,7 +63,8 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
     ];
   }
   back(): void {
-    this.router.navigate(['/']);
+    console.log(`/recipes/${this.currentPage}`);
+    this.router.navigate([`/recipes/${this.currentPage}`]);
   }
   ngOnDestroy() {
     this.subs.forEach((sub) => sub.unsubscribe());
