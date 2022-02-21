@@ -20,6 +20,7 @@ import * as fromApp from '../store/app.reducer';
   styleUrls: ['./recipes-list.component.scss'],
 })
 export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
+  public isLoading = true;
   public recipes: Recipe[];
   public fullRecipes: Recipe[];
   public pagedRecipes: Recipe[];
@@ -56,6 +57,7 @@ export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
         .select('recipes')
         .pipe(map((recipesState) => recipesState.recipes))
         .subscribe((updatedRecipes: Recipe[]) => {
+          this.isLoading = false;
           this.recipes = updatedRecipes;
           this.fullRecipes = updatedRecipes;
           this.navigate();
@@ -85,6 +87,7 @@ export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
       this.page * this.pageSize
     );
     this.router.navigate([`/recipes/${this.page}`], { relativeTo: this.route });
+    window.scrollTo(0, 0);
   }
 
   formInit(): void {
