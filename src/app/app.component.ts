@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 
 import * as RecipesActions from './store/recipes/recipe.actions';
+import * as GeneralActions from './store/general/general.actions';
 import * as fromApp from './store/app.reducer';
 
 @Component({
@@ -16,5 +17,10 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.store.dispatch(new RecipesActions.AnonymousLogin());
     this.store.dispatch(new RecipesActions.FetchRecipes());
+  }
+
+  resetSearch() {
+    this.store.dispatch(new GeneralActions.SetCurrentCategory(''));
+    this.store.dispatch(new GeneralActions.SetCurrentSearch(''));
   }
 }

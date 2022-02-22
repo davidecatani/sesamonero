@@ -12,7 +12,6 @@ export function authReducer(
   state = initialState,
   action: RecipesActions.RecipesActions
 ): State {
-  // console.log(action);
   switch (action.type) {
     case RecipesActions.SET_TOKEN:
       return {

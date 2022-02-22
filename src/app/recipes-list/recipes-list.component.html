@@ -1,4 +1,4 @@
-<div class="row mb-5">
+<div class="row mb-2">
   <div class="col-12">
     <form [formGroup]="searchForm">
       <input
@@ -14,12 +14,30 @@
       />
     </form>
   </div>
+  <div class="col-12">
+    <ul class="list-group list-group-horizontal category-list">
+      <li
+        class="category-item py-1 py-sm-2"
+        *ngFor="let category of categories"
+      >
+        <a
+          (click)="onCategorySelect(category)"
+          [ngClass]="{ active: category === selectedCategory }"
+          class="badge badge-secondary badge-pill"
+          [innerHtml]="category"
+        ></a>
+      </li>
+    </ul>
+  </div>
 </div>
 <div class="row">
-  <div class="col-12 text-center" *ngIf="isLoading || recipes.length == 0">
+  <div class="col-12 text-center" *ngIf="isLoading">
     <div class="spinner-border" role="status">
       <span class="sr-only">Loading...</span>
     </div>
+  </div>
+  <div class="col-12 text-center" *ngIf="!isLoading && recipes.length == 0">
+    <h3>Non ci sono ricette coi tui criteri di ricerca</h3>
   </div>
   <div class="col-12" *ngIf="recipes.length > 0">
     <div class="list-group recipes-list mb-5 flex-row flex-wrap">

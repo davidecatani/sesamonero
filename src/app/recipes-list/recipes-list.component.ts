@@ -13,7 +13,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormControl, FormGroup } from '@angular/forms';
 
 import * as fromApp from '../store/app.reducer';
-import { SetCurrentSearch, SetPage } from '../store/general/general.actions';
+import {
+  SetCurrentCategory,
+  SetCurrentSearch,
+  SetPage,
+} from '../store/general/general.actions';
 
 @Component({
   selector: 'app-recipes-list',
@@ -25,6 +29,8 @@ export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
   public recipes: Recipe[] = [];
   public fullRecipes: Recipe[] = [];
   public pagedRecipes: Recipe[] = [];
+  public categories: string[];
+  public selectedCategory: string;
   public page: number;
   public pageSize = 12;
   public total = 10000;
@@ -57,6 +63,7 @@ export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe((general) => {
         this.searchQuery = general.currentSearch;
         this.searchForm.setValue({ searchInput: this.searchQuery });
+        this.selectedCategory = general.currentCategory;
         this.recipesFilter();
       });
 
@@ -71,6 +78,11 @@ export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
         .pipe(map((recipesState) => recipesState.recipes))
         .subscribe((updatedRecipes: Recipe[]) => {
           if (updatedRecipes.length !== this.fullRecipes.length) {
+            this.categories = updatedRecipes
+              .map((item) => item.category)
+              .filter((value, index, self) => {
+                return self.indexOf(value) === index;
+              });
             this.isLoading = false;
             // this.recipes = updatedRecipes;
             this.fullRecipes = updatedRecipes;
@@ -92,13 +104,14 @@ export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   recipesFilter(): void {
     const re = new RegExp(this.searchQuery, 'i');
-    if (Boolean(this.searchQuery)) {
+    if (Boolean(this.searchQuery) || Boolean(this.selectedCategory)) {
       this.recipes = this.fullRecipes.filter(
         (recipe) =>
-          recipe.title.match(re) ||
-          recipe.ingredients.some((ingredient) =>
-            ingredient.ingredient.match(re)
-          )
+          (recipe.title.match(re) ||
+            recipe.ingredients.some((ingredient) =>
+              ingredient.ingredient.match(re)
+            )) &&
+          recipe.category === this.selectedCategory
       );
     } else {
       this.recipes = this.fullRecipes;
@@ -125,6 +138,15 @@ export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.router.navigate([`../${this.page}`], { relativeTo: this.route });
     this.store.dispatch(new SetPage(this.page));
   }
+
+  onCategorySelect(category: string): void {
+    this.selectedCategory =
+      category === this.selectedCategory ? null : category;
+    console.log({ category, selectedCategory: this.selectedCategory });
+    this.store.dispatch(new SetCurrentCategory(this.selectedCategory));
+    this.recipesFilter();
+  }
+
   ngOnDestroy(): void {
     this.subs.forEach((sub) => sub.unsubscribe());
   }
