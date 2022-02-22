@@ -59,7 +59,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
     ];
   }
   back(): void {
-    this.router.navigate([`/recipes/${this.currentPage}`]);
+    this.router.navigate([`/it/ricette/${this.currentPage}`]);
   }
   ngOnDestroy() {
     this.subs.forEach((sub) => sub.unsubscribe());

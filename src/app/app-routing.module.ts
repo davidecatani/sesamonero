@@ -4,9 +4,9 @@ import { RecipeDetailComponent } from './recipe-detail/recipe-detail.component';
 import { RecipesListComponent } from './recipes-list/recipes-list.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/recipes', pathMatch: 'full' },
+  { path: '', redirectTo: '/it/ricette', pathMatch: 'full' },
   {
-    path: 'recipes',
+    path: 'it/ricette',
     children: [
       {
         path: '',
@@ -17,11 +17,12 @@ const routes: Routes = [
         component: RecipesListComponent,
       },
       {
-        path: 'detail/:id',
+        path: ':category/:id',
         component: RecipeDetailComponent,
       },
     ],
   },
+  { path: '**', redirectTo: '/it/ricette', pathMatch: 'full' },
 ];
 
 @NgModule({

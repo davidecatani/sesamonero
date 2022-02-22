@@ -44,9 +44,7 @@ export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
     private route: ActivatedRoute,
     private router: Router,
     private store: Store<fromApp.AppState>
-  ) {
-    // this.searchQuery = '';
-  }
+  ) {}
 
   ngOnInit() {
     this.formInit();
@@ -84,7 +82,6 @@ export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
                 return self.indexOf(value) === index;
               });
             this.isLoading = false;
-            // this.recipes = updatedRecipes;
             this.fullRecipes = updatedRecipes;
             this.recipesFilter();
           }
@@ -124,7 +121,9 @@ export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
       (this.page - 1) * this.pageSize,
       this.page * this.pageSize
     );
-    this.router.navigate([`/recipes/${this.page}`], { relativeTo: this.route });
+    this.router.navigate([`/it/ricette/${this.page}`], {
+      relativeTo: this.route,
+    });
     window.scrollTo(0, 0);
   }
 
@@ -142,7 +141,6 @@ export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
   onCategorySelect(category: string): void {
     this.selectedCategory =
       category === this.selectedCategory ? null : category;
-    console.log({ category, selectedCategory: this.selectedCategory });
     this.store.dispatch(new SetCurrentCategory(this.selectedCategory));
     this.recipesFilter();
   }

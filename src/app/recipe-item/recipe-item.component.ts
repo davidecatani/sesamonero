@@ -35,7 +35,9 @@ export class RecipeItemComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
-    this.detailUrl = `/recipes/detail/${slugify(this.recipe.title)}`;
+    this.detailUrl = `/it/ricette/${slugify(this.recipe.category)}/${slugify(
+      this.recipe.title
+    )}`;
     this.imageSrc = `/assets/images/${encodeURIComponent(
       this.recipe.imageName
     )}`;
