@@ -24,8 +24,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private store: Store<fromApp.AppState>,
-    private location: Location
+    private store: Store<fromApp.AppState>
   ) {}
 
   ngOnInit() {
@@ -33,7 +32,6 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
       ...this.subs,
       this.store.select('general').subscribe((data) => {
         this.currentPage = data.currentPage ? data.currentPage : 1;
-        console.log(data);
       }),
       this.route.params
         .pipe(
@@ -42,7 +40,6 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
           }),
           switchMap((id) => {
             this.id = id ? id : '1';
-            //  console.log(this.id, id);
             return this.store.select('recipes');
           }),
           map((recipeState) => {
@@ -53,7 +50,6 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
         )
         .subscribe((recipe) => {
           this.recipe = recipe;
-          console.log(this.recipe.description);
           if (recipe) {
             this.imageSrc = `/assets/images/${encodeURIComponent(
               recipe.imageName
@@ -63,7 +59,6 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
     ];
   }
   back(): void {
-    console.log(`/recipes/${this.currentPage}`);
     this.router.navigate([`/recipes/${this.currentPage}`]);
   }
   ngOnDestroy() {
