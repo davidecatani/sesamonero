@@ -22,5 +22,6 @@ export class AppComponent implements OnInit {
   resetSearch() {
     this.store.dispatch(new GeneralActions.SetCurrentCategory(''));
     this.store.dispatch(new GeneralActions.SetCurrentSearch(''));
+    this.store.dispatch(new GeneralActions.SetPage(1));
   }
 }

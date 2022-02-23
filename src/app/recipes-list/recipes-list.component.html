@@ -22,7 +22,7 @@
       >
         <a
           (click)="onCategorySelect(category)"
-          [ngClass]="{ active: category === selectedCategory }"
+          [ngClass]="categoryComparison(category, selectedCategory)"
           class="badge badge-secondary badge-pill"
           [innerHtml]="category"
         ></a>

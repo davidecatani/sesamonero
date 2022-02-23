@@ -4,7 +4,6 @@ import {
   OnInit,
   ViewChild,
   ElementRef,
-  AfterViewInit,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { map, Subscription, take } from 'rxjs';
@@ -18,13 +17,14 @@ import {
   SetCurrentSearch,
   SetPage,
 } from '../store/general/general.actions';
+import { slugify } from '../utils';
 
 @Component({
   selector: 'app-recipes-list',
   templateUrl: './recipes-list.component.html',
   styleUrls: ['./recipes-list.component.scss'],
 })
-export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
+export class RecipesListComponent implements OnInit, OnDestroy {
   public isLoading = true;
   public recipes: Recipe[] = [];
   public fullRecipes: Recipe[] = [];
@@ -44,32 +44,32 @@ export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
     private route: ActivatedRoute,
     private router: Router,
     private store: Store<fromApp.AppState>
-  ) {}
+  ) {
+    this.page = 1;
+  }
 
   ngOnInit() {
     this.formInit();
-    this.recipesFilter();
-    this.page = this.route.snapshot.paramMap.get('pageNumber')
-      ? +this.route.snapshot.paramMap.get('pageNumber')
-      : 1;
-
-    this.store.dispatch(new SetPage(this.page));
 
     this.store
       .select('general')
       .pipe(take(1))
       .subscribe((general) => {
         this.searchQuery = general.currentSearch;
+        this.page = general.currentPage ? general.currentPage : 1;
         this.searchForm.setValue({ searchInput: this.searchQuery });
-        this.selectedCategory = general.currentCategory;
         this.recipesFilter();
       });
 
     this.subs = [
       ...this.subs,
       this.route.params.subscribe((params) => {
-        this.page = params['pageNumber'] ? +params['pageNumber'] : 1;
-        this.navigate();
+        this.selectedCategory = params['category'] ? params['category'] : '';
+        this.store.dispatch(new SetCurrentCategory(this.selectedCategory));
+        if (this.selectedCategory) {
+          this.recipesFilter();
+        }
+        this.getCurrentPagedRecipes();
       }),
       this.store
         .select('recipes')
@@ -95,12 +95,10 @@ export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
         this.recipesFilter();
       });
   }
-  ngAfterViewInit() {
-    // this.searchInput.nativeElement.focus();
-  }
 
   recipesFilter(): void {
     const re = new RegExp(this.searchQuery, 'i');
+    this.recipes = this.fullRecipes;
     if (Boolean(this.searchQuery) || Boolean(this.selectedCategory)) {
       this.recipes = this.fullRecipes.filter(
         (recipe) =>
@@ -108,22 +106,20 @@ export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
             recipe.ingredients.some((ingredient) =>
               ingredient.ingredient.match(re)
             )) &&
-          recipe.category === this.selectedCategory
+          (slugify(recipe.category) === this.selectedCategory ||
+            !Boolean(this.selectedCategory))
       );
     } else {
       this.recipes = this.fullRecipes;
     }
-    this.navigate();
+    this.getCurrentPagedRecipes();
   }
 
-  navigate() {
+  getCurrentPagedRecipes() {
     this.pagedRecipes = this.recipes?.slice(
       (this.page - 1) * this.pageSize,
       this.page * this.pageSize
     );
-    this.router.navigate([`/it/ricette/${this.page}`], {
-      relativeTo: this.route,
-    });
     window.scrollTo(0, 0);
   }
 
@@ -134,18 +130,26 @@ export class RecipesListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onPageChange(event) {
-    this.router.navigate([`../${this.page}`], { relativeTo: this.route });
+    this.page = event;
+    this.getCurrentPagedRecipes();
     this.store.dispatch(new SetPage(this.page));
   }
 
   onCategorySelect(category: string): void {
     this.selectedCategory =
-      category === this.selectedCategory ? null : category;
+      slugify(category) === this.selectedCategory ? '' : slugify(category);
     this.store.dispatch(new SetCurrentCategory(this.selectedCategory));
+    this.router.navigate([`/it/ricette/${slugify(this.selectedCategory)}`], {
+      relativeTo: this.route,
+    });
     this.recipesFilter();
   }
 
   ngOnDestroy(): void {
     this.subs.forEach((sub) => sub.unsubscribe());
+  }
+
+  categoryComparison(category: string, selectedCategory: string) {
+    return slugify(category) === slugify(selectedCategory) ? 'active' : '';
   }
 }

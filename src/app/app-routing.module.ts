@@ -12,8 +12,12 @@ const routes: Routes = [
         path: '',
         component: RecipesListComponent,
       },
+      // {
+      //   path: ':pageNumber',
+      //   component: RecipesListComponent,
+      // },
       {
-        path: ':pageNumber',
+        path: ':category',
         component: RecipesListComponent,
       },
       {
