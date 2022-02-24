@@ -16,3 +16,12 @@ export const slugify = (string) => {
     .replace(/^-+/, '') // Trim - from start of text
     .replace(/-+$/, ''); // Trim - from end of text
 };
+
+export const format_time = (s) => {
+  const dtFormat = new Intl.DateTimeFormat('en-GB', {
+    timeStyle: 'medium',
+    timeZone: 'UTC',
+  });
+
+  return dtFormat.format(new Date(s * 1e3));
+};

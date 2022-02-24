@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
 
 import { Recipe } from '../models/recipe.model';
 import * as fromApp from '../store/app.reducer';
-import { slugify } from '../utils';
+import { format_time, slugify } from '../utils';
 import { title } from 'process';
 
 @Component({
@@ -75,7 +75,10 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
                 name: 'og:image',
                 content: `${environment.siteDomain}${this.imageSrc}`,
               },
-              { name: 'og:updated_time', content: this.recipe.date },
+              {
+                name: 'og:updated_time',
+                content: this.recipe.date,
+              },
             ]);
           }
         }),
