@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
+  siteDomain: 'http://www.sesamonero.com',
   firebaseApiKey: 'AIzaSyDGzQkVIsbmwRNwUMRrbh0Vmp6zWUwLBTQ',
   firebase: {
     apiKey: 'AIzaSyDGzQkVIsbmwRNwUMRrbh0Vmp6zWUwLBTQ',

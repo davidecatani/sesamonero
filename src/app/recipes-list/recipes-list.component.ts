@@ -18,6 +18,8 @@ import {
   SetPage,
 } from '../store/general/general.actions';
 import { slugify } from '../utils';
+import { Meta, Title } from '@angular/platform-browser';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-recipes-list',
@@ -43,12 +45,26 @@ export class RecipesListComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private store: Store<fromApp.AppState>
+    private store: Store<fromApp.AppState>,
+    private titleService: Title,
+    private meta: Meta
   ) {
     this.page = 1;
+    this.meta.addTags([
+      { name: 'description', content: 'Il tuo ricettario' },
+      { name: 'og:site_name', content: 'Sesamonero' },
+      { name: 'og:type', content: 'food' },
+      {
+        name: 'og:url',
+        content: `${environment.siteDomain}/it/ricette/`,
+      },
+      { name: 'og:title', content: 'Sesamonero' },
+      { name: 'og:description', content: 'Il tuo ricettario' },
+    ]);
   }
 
   ngOnInit() {
+    this.setTitle();
     this.formInit();
 
     this.store
@@ -94,6 +110,10 @@ export class RecipesListComponent implements OnInit, OnDestroy {
         this.searchQuery = selectedValue;
         this.recipesFilter();
       });
+  }
+
+  setTitle(title = 'Sesamonero | Il tuo ricettario') {
+    this.titleService.setTitle(`Sesamonero | Il tuo ricettario`);
   }
 
   recipesFilter(): void {

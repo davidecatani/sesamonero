@@ -3,11 +3,13 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { Location } from '@angular/common';
+import { Meta, Title } from '@angular/platform-browser';
+import { environment } from '../../environments/environment';
 
 import { Recipe } from '../models/recipe.model';
 import * as fromApp from '../store/app.reducer';
 import { slugify } from '../utils';
+import { title } from 'process';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -24,7 +26,9 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private store: Store<fromApp.AppState>
+    private store: Store<fromApp.AppState>,
+    private meta: Meta,
+    private titleService: Title
   ) {}
 
   ngOnInit() {
@@ -54,6 +58,25 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
             this.imageSrc = `/assets/images/${encodeURIComponent(
               recipe.imageName
             )}`;
+            this.titleService.setTitle(`${this.recipe.title} | Sesamonero`);
+            this.meta.addTags([
+              { name: 'description', content: this.recipe.intro },
+              { name: 'og:site_name', content: 'Sesamonero' },
+              { name: 'og:type', content: 'food' },
+              {
+                name: 'og:url',
+                content: `${environment.siteDomain}/it/ricette/${slugify(
+                  this.currentCategory
+                )}/${slugify(this.recipe.title)}`,
+              },
+              { name: 'og:title', content: this.recipe.title },
+              { name: 'og:description', content: this.recipe.description },
+              {
+                name: 'og:image',
+                content: `${environment.siteDomain}${this.imageSrc}`,
+              },
+              { name: 'og:updated_time', content: this.recipe.date },
+            ]);
           }
         }),
     ];
