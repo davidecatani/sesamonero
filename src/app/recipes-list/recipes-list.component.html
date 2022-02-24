@@ -47,6 +47,7 @@
       ></app-recipe-item>
     </div>
     <ngb-pagination
+      *ngIf="recipes.length > pageSize"
       [collectionSize]="recipes.length"
       [pageSize]="pageSize"
       [maxSize]="6"
