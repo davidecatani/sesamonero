@@ -12,7 +12,7 @@ import { Recipe } from '../models/recipe.model';
 
 import * as firebase from 'firebase/app';
 import { environment } from 'src/environments/environment';
-import { slugify } from '../utils';
+import { getRemoteImages, slugify } from '../utils';
 
 firebase.initializeApp(environment.firebase);
 
@@ -38,8 +38,6 @@ export class RecipeItemComponent implements OnInit {
     this.detailUrl = `/it/ricette/${slugify(this.recipe.category)}/${slugify(
       this.recipe.title
     )}`;
-    this.imageSrc = `/assets/images/${encodeURIComponent(
-      this.recipe.imageName
-    )}`;
+    this.imageSrc = getRemoteImages(this.recipe.imageName);
   }
 }

@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
 
 import { Recipe } from '../models/recipe.model';
 import * as fromApp from '../store/app.reducer';
-import { format_time, slugify } from '../utils';
+import { format_time, getRemoteImages, slugify } from '../utils';
 import { title } from 'process';
 
 @Component({
@@ -55,9 +55,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
         .subscribe((recipe) => {
           this.recipe = recipe;
           if (recipe) {
-            this.imageSrc = `/assets/images/${encodeURIComponent(
-              recipe.imageName
-            )}`;
+            this.imageSrc = getRemoteImages(recipe.imageName);
             this.titleService.setTitle(`${this.recipe.title} | Sesamonero`);
             this.meta.addTags([
               { name: 'description', content: this.recipe.intro },
@@ -73,7 +71,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
               { name: 'og:description', content: this.recipe.description },
               {
                 name: 'og:image',
-                content: `${environment.siteDomain}${this.imageSrc}`,
+                content: `${this.imageSrc}`,
               },
               {
                 name: 'og:updated_time',

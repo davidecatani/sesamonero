@@ -1,3 +1,5 @@
+import { environment } from 'src/environments/environment';
+
 export const slugify = (string) => {
   const a =
     'àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìıİłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;';
@@ -24,4 +26,16 @@ export const format_time = (s) => {
   });
 
   return dtFormat.format(new Date(s * 1e3));
+};
+
+export const getLocalImages = (fileName: string) => {
+  return `${environment.siteDomain}/assets/images/${encodeURIComponent(
+    fileName
+  )}`;
+};
+
+export const getRemoteImages = (fileName: string) => {
+  return `https://storage.googleapis.com/sesamonero-images/${encodeURIComponent(
+    fileName
+  )}`;
 };
