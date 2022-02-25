@@ -1,24 +1,7 @@
-import {
-  AfterViewInit,
-  Component,
-  Input,
-  OnInit,
-  ViewChild,
-  ViewContainerRef,
-} from '@angular/core';
-import { getStorage, ref, getDownloadURL, listAll } from 'firebase/storage';
+import { Component, Input, OnInit } from '@angular/core';
 
 import { Recipe } from '../models/recipe.model';
-
-import * as firebase from 'firebase/app';
-import { environment } from 'src/environments/environment';
 import { getRemoteImages, slugify } from '../utils';
-
-firebase.initializeApp(environment.firebase);
-
-const storage = getStorage();
-const listRef = ref(storage, 'images');
-
 @Component({
   selector: 'app-recipe-item',
   templateUrl: './recipe-item.component.html',
