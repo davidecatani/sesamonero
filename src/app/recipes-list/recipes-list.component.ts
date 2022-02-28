@@ -156,6 +156,7 @@ export class RecipesListComponent implements OnInit, OnDestroy {
   }
 
   onCategorySelect(category: string): void {
+    this.onPageChange(1);
     this.selectedCategory =
       slugify(category) === this.selectedCategory ? '' : slugify(category);
     this.store.dispatch(new SetCurrentCategory(this.selectedCategory));
