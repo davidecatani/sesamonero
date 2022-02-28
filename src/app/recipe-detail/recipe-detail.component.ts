@@ -8,8 +8,7 @@ import { environment } from '../../environments/environment';
 
 import { Recipe } from '../models/recipe.model';
 import * as fromApp from '../store/app.reducer';
-import { format_time, getRemoteImages, slugify } from '../utils';
-import { title } from 'process';
+import { getRemoteImages, slugify } from '../utils';
 
 @Component({
   selector: 'app-recipe-detail',
