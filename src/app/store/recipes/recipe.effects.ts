@@ -10,6 +10,10 @@ import { Recipe } from '../../models/recipe.model';
 import * as RecipesActions from './recipe.actions';
 import * as fromApp from '../app.reducer';
 
+import * as firebase from 'firebase/app';
+import { environment } from 'src/environments/environment';
+firebase.initializeApp(environment.firebase);
+
 export interface AuthResponseData {
   kind?: string;
   idToken: string;
