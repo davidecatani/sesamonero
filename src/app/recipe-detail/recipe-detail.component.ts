@@ -1,8 +1,8 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { filter, map, switchMap } from 'rxjs/operators';
 import { Meta, Title } from '@angular/platform-browser';
 import { environment } from '../../environments/environment';
 
@@ -18,7 +18,6 @@ import { getRemoteImages, slugify } from '../utils';
 export class RecipeDetailComponent implements OnInit, OnDestroy {
   public recipe: Recipe;
   public id: string;
-  public imageSrc: string;
   public currentCategory: string;
   private subs: Subscription[] = [];
 
@@ -49,12 +48,14 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
             return recipeState.recipes.find(
               (recipe) => slugify(recipe.title) === this.id
             );
+          }),
+          filter((recipe) => {
+            return Boolean(recipe);
           })
         )
         .subscribe((recipe) => {
           this.recipe = recipe;
-          if (recipe) {
-            this.imageSrc = getRemoteImages(recipe.imageName);
+          if (recipe.title) {
             this.titleService.setTitle(`${this.recipe.title} | Sesamonero`);
             this.meta.addTags([
               { name: 'description', content: this.recipe.intro },
@@ -70,7 +71,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
               { name: 'og:description', content: this.recipe.description },
               {
                 name: 'og:image',
-                content: `${this.imageSrc}`,
+                content: `${getRemoteImages(this.recipe.imageName)}`,
               },
               {
                 name: 'og:updated_time',

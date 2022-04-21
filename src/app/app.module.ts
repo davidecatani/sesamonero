@@ -18,6 +18,7 @@ import { CoreModule } from './core.module';
 import * as fromApp from './store/app.reducer';
 import { Nl2brPipe } from './pipes/nl2br.pipe';
 import { RemoveBracketsPipe } from './pipes/removeBrackets.pipe';
+import { GetRemoteImages } from './pipes/getRemoteImages.pipe';
 
 // import { initializeApp } from 'firebase/app';
 @NgModule({
@@ -27,6 +28,7 @@ import { RemoveBracketsPipe } from './pipes/removeBrackets.pipe';
     RecipeItemComponent,
     RecipeDetailComponent,
     Nl2brPipe,
+    GetRemoteImages,
     RemoveBracketsPipe,
   ],
   imports: [
