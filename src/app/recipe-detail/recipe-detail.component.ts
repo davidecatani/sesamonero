@@ -1,8 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Subscription } from 'rxjs';
-import { filter, map, switchMap } from 'rxjs/operators';
+import { filter, map, switchMap, takeWhile } from 'rxjs/operators';
 import { Meta, Title } from '@angular/platform-browser';
 import { environment } from '../../environments/environment';
 
@@ -19,7 +18,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   public recipe: Recipe;
   public id: string;
   public currentCategory: string;
-  private subs: Subscription[] = [];
+  private alive = true;
 
   constructor(
     private route: ActivatedRoute,
@@ -30,62 +29,63 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.subs = [
-      ...this.subs,
-      this.store.select('general').subscribe((data) => {
+    this.store
+      .select('general')
+      .pipe(takeWhile(() => this.alive))
+      .subscribe((data) => {
         this.currentCategory = data.currentCategory ? data.currentCategory : '';
-      }),
-      this.route.params
-        .pipe(
-          map((params) => {
-            return params['id'];
-          }),
-          switchMap((id) => {
-            this.id = id ? id : '1';
-            return this.store.select('recipes');
-          }),
-          map((recipeState) => {
-            return recipeState.recipes.find(
-              (recipe) => slugify(recipe.title) === this.id
-            );
-          }),
-          filter((recipe) => {
-            return Boolean(recipe);
-          })
-        )
-        .subscribe((recipe) => {
-          this.recipe = recipe;
-          if (recipe.title) {
-            this.titleService.setTitle(`${this.recipe.title} | Sesamonero`);
-            this.meta.addTags([
-              { name: 'description', content: this.recipe.intro },
-              { name: 'og:site_name', content: 'Sesamonero' },
-              { name: 'og:type', content: 'food' },
-              {
-                name: 'og:url',
-                content: `${environment.siteDomain}/it/ricette/${slugify(
-                  this.currentCategory
-                )}/${slugify(this.recipe.title)}`,
-              },
-              { name: 'og:title', content: this.recipe.title },
-              { name: 'og:description', content: this.recipe.description },
-              {
-                name: 'og:image',
-                content: `${getRemoteImages(this.recipe.imageName)}`,
-              },
-              {
-                name: 'og:updated_time',
-                content: this.recipe.date,
-              },
-            ]);
-          }
+      });
+    this.route.params
+      .pipe(
+        takeWhile(() => this.alive),
+        map((params) => {
+          return params['id'];
         }),
-    ];
+        switchMap((id) => {
+          this.id = id ? id : '1';
+          return this.store.select('recipes');
+        }),
+        map((recipeState) => {
+          return recipeState.recipes.find(
+            (recipe) => slugify(recipe.title) === this.id
+          );
+        }),
+        filter((recipe) => {
+          return Boolean(recipe);
+        })
+      )
+      .subscribe((recipe) => {
+        this.recipe = recipe;
+        if (recipe.title) {
+          this.titleService.setTitle(`${this.recipe.title} | Sesamonero`);
+          this.meta.addTags([
+            { name: 'description', content: this.recipe.intro },
+            { name: 'og:site_name', content: 'Sesamonero' },
+            { name: 'og:type', content: 'food' },
+            {
+              name: 'og:url',
+              content: `${environment.siteDomain}/it/ricette/${slugify(
+                this.currentCategory
+              )}/${slugify(this.recipe.title)}`,
+            },
+            { name: 'og:title', content: this.recipe.title },
+            { name: 'og:description', content: this.recipe.description },
+            {
+              name: 'og:image',
+              content: `${getRemoteImages(this.recipe.imageName)}`,
+            },
+            {
+              name: 'og:updated_time',
+              content: this.recipe.date,
+            },
+          ]);
+        }
+      });
   }
   back(): void {
     this.router.navigate([`/it/ricette/${slugify(this.currentCategory)}`]);
   }
   ngOnDestroy() {
-    this.subs.forEach((sub) => sub.unsubscribe());
+    this.alive = false;
   }
 }

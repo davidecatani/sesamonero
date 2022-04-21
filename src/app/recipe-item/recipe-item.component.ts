@@ -9,9 +9,7 @@ import { getRemoteImages, slugify } from '../utils';
   host: { class: ' col-12 col-sm-4 col-lg-3 d-flex' },
 })
 export class RecipeItemComponent implements OnInit {
-  @Input() recipe: Recipe;
-
-  public imageUrl: string;
+  @Input() public recipe: Recipe;
   public imageSrc: string;
   public detailUrl: string;
 
