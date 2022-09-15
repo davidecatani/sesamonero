@@ -2056,7 +2056,7 @@
         },
         {
             "name": "RecipeDetailComponent",
-            "id": "component-RecipeDetailComponent-23c6352f3745aa10fad35d65988be275662e778fb1b6871ef235834c06ca67661c7b446003cdec73a4b07149127fb99c8659c6dccdb3554805a437e6b5374b8e",
+            "id": "component-RecipeDetailComponent-401be132032004c6058dbf81c5139cc86a3961722b2add763489b654b2fce40048b8be5c35edf4d9a72f167aa35ede7cdb34609be03e713baae94272f1466442",
             "file": "src/app/recipe-detail/recipe-detail.component.ts",
             "encapsulation": [],
             "entryComponents": [],
@@ -2076,19 +2076,20 @@
             "outputsClass": [],
             "propertiesClass": [
                 {
-                    "name": "currentCategory",
+                    "name": "alive",
+                    "defaultValue": "true",
                     "deprecated": false,
                     "deprecationMessage": "",
-                    "type": "string",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 21,
                     "modifierKind": [
-                        123
+                        121
                     ]
                 },
                 {
-                    "name": "id",
+                    "name": "currentCategory",
                     "deprecated": false,
                     "deprecationMessage": "",
                     "type": "string",
@@ -2100,10 +2101,10 @@
                     ]
                 },
                 {
-                    "name": "recipe",
+                    "name": "id",
                     "deprecated": false,
                     "deprecationMessage": "",
-                    "type": "Recipe",
+                    "type": "string",
                     "optional": false,
                     "description": "",
                     "line": 19,
@@ -2112,16 +2113,15 @@
                     ]
                 },
                 {
-                    "name": "subs",
-                    "defaultValue": "[]",
+                    "name": "recipe",
                     "deprecated": false,
                     "deprecationMessage": "",
-                    "type": "Subscription[]",
+                    "type": "Recipe",
                     "optional": false,
                     "description": "",
-                    "line": 22,
+                    "line": 18,
                     "modifierKind": [
-                        121
+                        123
                     ]
                 }
             ],
@@ -2152,7 +2152,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 32,
+                    "line": 31,
                     "deprecated": false,
                     "deprecationMessage": ""
                 }
@@ -2164,7 +2164,7 @@
             "description": "",
             "rawdescription": "\n",
             "type": "component",
-            "sourceCode": "import { Component, Input, OnDestroy, OnInit } from '@angular/core';\nimport { ActivatedRoute, Params, Router } from '@angular/router';\nimport { Store } from '@ngrx/store';\nimport { Subscription } from 'rxjs';\nimport { filter, map, switchMap } from 'rxjs/operators';\nimport { Meta, Title } from '@angular/platform-browser';\nimport { environment } from '../../environments/environment';\n\nimport { Recipe } from '../models/recipe.model';\nimport * as fromApp from '../store/app.reducer';\nimport { getRemoteImages, slugify } from '../utils';\n\n@Component({\n  selector: 'app-recipe-detail',\n  templateUrl: './recipe-detail.component.html',\n  styleUrls: ['./recipe-detail.component.scss'],\n})\nexport class RecipeDetailComponent implements OnInit, OnDestroy {\n  public recipe: Recipe;\n  public id: string;\n  public currentCategory: string;\n  private subs: Subscription[] = [];\n\n  constructor(\n    private route: ActivatedRoute,\n    private router: Router,\n    private store: Store<fromApp.AppState>,\n    private meta: Meta,\n    private titleService: Title\n  ) {}\n\n  ngOnInit() {\n    this.subs = [\n      ...this.subs,\n      this.store.select('general').subscribe((data) => {\n        this.currentCategory = data.currentCategory ? data.currentCategory : '';\n      }),\n      this.route.params\n        .pipe(\n          map((params) => {\n            return params['id'];\n          }),\n          switchMap((id) => {\n            this.id = id ? id : '1';\n            return this.store.select('recipes');\n          }),\n          map((recipeState) => {\n            return recipeState.recipes.find(\n              (recipe) => slugify(recipe.title) === this.id\n            );\n          }),\n          filter((recipe) => {\n            return Boolean(recipe);\n          })\n        )\n        .subscribe((recipe) => {\n          this.recipe = recipe;\n          if (recipe.title) {\n            this.titleService.setTitle(`${this.recipe.title} | Sesamonero`);\n            this.meta.addTags([\n              { name: 'description', content: this.recipe.intro },\n              { name: 'og:site_name', content: 'Sesamonero' },\n              { name: 'og:type', content: 'food' },\n              {\n                name: 'og:url',\n                content: `${environment.siteDomain}/it/ricette/${slugify(\n                  this.currentCategory\n                )}/${slugify(this.recipe.title)}`,\n              },\n              { name: 'og:title', content: this.recipe.title },\n              { name: 'og:description', content: this.recipe.description },\n              {\n                name: 'og:image',\n                content: `${getRemoteImages(this.recipe.imageName)}`,\n              },\n              {\n                name: 'og:updated_time',\n                content: this.recipe.date,\n              },\n            ]);\n          }\n        }),\n    ];\n  }\n  back(): void {\n    this.router.navigate([`/it/ricette/${slugify(this.currentCategory)}`]);\n  }\n  ngOnDestroy() {\n    this.subs.forEach((sub) => sub.unsubscribe());\n  }\n}\n",
+            "sourceCode": "import { Component, Input, OnDestroy, OnInit } from '@angular/core';\nimport { ActivatedRoute, Params, Router } from '@angular/router';\nimport { Store } from '@ngrx/store';\nimport { filter, map, switchMap, takeWhile } from 'rxjs/operators';\nimport { Meta, Title } from '@angular/platform-browser';\nimport { environment } from '../../environments/environment';\n\nimport { Recipe } from '../models/recipe.model';\nimport * as fromApp from '../store/app.reducer';\nimport { getRemoteImages, slugify } from '../utils';\n\n@Component({\n  selector: 'app-recipe-detail',\n  templateUrl: './recipe-detail.component.html',\n  styleUrls: ['./recipe-detail.component.scss'],\n})\nexport class RecipeDetailComponent implements OnInit, OnDestroy {\n  public recipe: Recipe;\n  public id: string;\n  public currentCategory: string;\n  private alive = true;\n\n  constructor(\n    private route: ActivatedRoute,\n    private router: Router,\n    private store: Store<fromApp.AppState>,\n    private meta: Meta,\n    private titleService: Title\n  ) {}\n\n  ngOnInit() {\n    this.store\n      .select('general')\n      .pipe(takeWhile(() => this.alive))\n      .subscribe((data) => {\n        this.currentCategory = data.currentCategory ? data.currentCategory : '';\n      });\n    this.route.params\n      .pipe(\n        takeWhile(() => this.alive),\n        map((params) => {\n          return params['id'];\n        }),\n        switchMap((id) => {\n          this.id = id ? id : '1';\n          return this.store.select('recipes');\n        }),\n        map((recipeState) => {\n          return recipeState.recipes.find(\n            (recipe) => slugify(recipe.title) === this.id\n          );\n        }),\n        filter((recipe) => {\n          return Boolean(recipe);\n        })\n      )\n      .subscribe((recipe) => {\n        this.recipe = recipe;\n        if (recipe.title) {\n          this.titleService.setTitle(`${this.recipe.title} | Sesamonero`);\n          this.meta.addTags([\n            { name: 'description', content: this.recipe.intro },\n            { name: 'og:site_name', content: 'Sesamonero' },\n            { name: 'og:type', content: 'food' },\n            {\n              name: 'og:url',\n              content: `${environment.siteDomain}/it/ricette/${slugify(\n                this.currentCategory\n              )}/${slugify(this.recipe.title)}`,\n            },\n            { name: 'og:title', content: this.recipe.title },\n            { name: 'og:description', content: this.recipe.description },\n            {\n              name: 'og:image',\n              content: `${getRemoteImages(this.recipe.imageName)}`,\n            },\n            {\n              name: 'og:updated_time',\n              content: this.recipe.date,\n            },\n          ]);\n        }\n      });\n  }\n  back(): void {\n    this.router.navigate([`/it/ricette/${slugify(this.currentCategory)}`]);\n  }\n  ngOnDestroy() {\n    this.alive = false;\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -2210,7 +2210,7 @@
                         "deprecationMessage": ""
                     }
                 ],
-                "line": 22,
+                "line": 21,
                 "jsdoctags": [
                     {
                         "name": "route",
@@ -2267,7 +2267,7 @@
         },
         {
             "name": "RecipeItemComponent",
-            "id": "component-RecipeItemComponent-d88ff05f29a35ed1acdbde9a3d8b32187ddcb7d4f977da558c269ed42a9d0bd099ce7d56ccaed8e356abf0d76407adee7ea977d959bdffd7f1407caaaf15e2f3",
+            "id": "component-RecipeItemComponent-f8de602237bdc98ad6a69f64ef9681cbaac4f07f64188621dcee23e7a7ca6771c73c15d89864a20dc086d35c65ba4acf50f4af77c53c3a89be2cdc90ab295c85",
             "file": "src/app/recipe-item/recipe-item.component.ts",
             "encapsulation": [],
             "entryComponents": [],
@@ -2303,25 +2303,13 @@
                     "type": "string",
                     "optional": false,
                     "description": "",
-                    "line": 15,
-                    "modifierKind": [
-                        123
-                    ]
-                },
-                {
-                    "name": "imageSrc",
-                    "deprecated": false,
-                    "deprecationMessage": "",
-                    "type": "string",
-                    "optional": false,
-                    "description": "",
                     "line": 14,
                     "modifierKind": [
                         123
                     ]
                 },
                 {
-                    "name": "title",
+                    "name": "imageSrc",
                     "deprecated": false,
                     "deprecationMessage": "",
                     "type": "string",
@@ -2340,7 +2328,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 19,
+                    "line": 18,
                     "deprecated": false,
                     "deprecationMessage": ""
                 }
@@ -2352,7 +2340,7 @@
             "description": "",
             "rawdescription": "\n",
             "type": "component",
-            "sourceCode": "import { Component, Input, OnInit } from '@angular/core';\n\nimport { Recipe } from '../models/recipe.model';\nimport { getRemoteImages, slugify } from '../utils';\n@Component({\n  selector: 'app-recipe-item',\n  templateUrl: './recipe-item.component.html',\n  styleUrls: ['./recipe-item.component.scss'],\n  host: { class: ' col-12 col-sm-4 col-lg-3 d-flex' },\n})\nexport class RecipeItemComponent implements OnInit {\n  @Input() public recipe: Recipe;\n  public title: string;\n  public imageSrc: string;\n  public detailUrl: string;\n\n  constructor() {}\n\n  ngOnInit() {\n    this.title = this.recipe.title;\n    this.detailUrl = `/it/ricette/${slugify(this.recipe.category)}/${slugify(\n      this.recipe.title\n    )}`;\n    this.imageSrc = getRemoteImages(this.recipe.imageName);\n  }\n}\n",
+            "sourceCode": "import { Component, Input, OnInit } from '@angular/core';\n\nimport { Recipe } from '../models/recipe.model';\nimport { getRemoteImages, slugify } from '../utils';\n@Component({\n  selector: 'app-recipe-item',\n  templateUrl: './recipe-item.component.html',\n  styleUrls: ['./recipe-item.component.scss'],\n  host: { class: ' col-12 col-sm-4 col-lg-3 d-flex' },\n})\nexport class RecipeItemComponent implements OnInit {\n  @Input() public recipe: Recipe;\n  public imageSrc: string;\n  public detailUrl: string;\n\n  constructor() {}\n\n  ngOnInit() {\n    this.detailUrl = `/it/ricette/${slugify(this.recipe.category)}/${slugify(\n      this.recipe.title\n    )}`;\n    this.imageSrc = getRemoteImages(this.recipe.imageName);\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -2367,12 +2355,12 @@
                 "deprecated": false,
                 "deprecationMessage": "",
                 "args": [],
-                "line": 15
+                "line": 14
             },
             "implements": [
                 "OnInit"
             ],
-            "templateData": "<a\n  class=\"\n    list-group-item list-group-item-action\n    flex-column\n    align-items-start\n    recipe-item\n  \"\n  routerLinkActive=\"active\"\n  [routerLink]=\"[detailUrl]\"\n>\n  <div class=\"inner\">\n    <div class=\"img-wrapper\">\n      <img [src]=\"imageSrc\" alt=\"{{ title }}\" class=\"img-fluid\" />\n    </div>\n    <h4 class=\"list-group-item-heading\" [innerHtml]=\"title\"></h4>\n    <h5 [innerText]=\"recipe.category\"></h5>\n  </div>\n</a>\n"
+            "templateData": "<a\n  class=\"\n    list-group-item list-group-item-action\n    flex-column\n    align-items-start\n    recipe-item\n  \"\n  routerLinkActive=\"active\"\n  [routerLink]=\"[detailUrl]\"\n>\n  <div class=\"inner\">\n    <div class=\"img-wrapper\">\n      <img [src]=\"imageSrc\" alt=\"{{ recipe.title }}\" class=\"img-fluid\" />\n    </div>\n    <h4 class=\"list-group-item-heading\" [innerHtml]=\"recipe.title\"></h4>\n    <h5 [innerText]=\"recipe.category\"></h5>\n  </div>\n</a>\n"
         },
         {
             "name": "RecipesListComponent",
@@ -3068,8 +3056,8 @@
                 "file": "src/app/recipe-detail/recipe-detail.stories.ts",
                 "deprecated": false,
                 "deprecationMessage": "",
-                "type": "Story",
-                "defaultValue": "() => ({\n  props: {\n    label: 'RecipeDetailComponent',\n    recipe: {\n      author: {\n        email: 'dave.catani@gmail.com',\n        id: '1',\n        name: 'Davide Catani',\n      },\n      category: 'Frutta e dolci',\n      cookingTime: '30 minuti',\n      date: '2017-02-26 20:50:13',\n      description:\n        \"Sciogliere il burro in un pentolino.\\nTritare i biscotti e unire il tutto.\\nVersare in una teglia e formare una base compatta e uniforme.\\nFrullare il resto degli ingredienti e versarli sopra la base di biscotti.\\nCuocere in forno per mezz'ora circa a 180° finchè non diventa solida.\\nLasciar sfreddare e ricoprire di marmellata.\\n\",\n      difficulty: 'facile',\n      id: '240',\n      imageName: 'Cheese_Cake.jpg',\n      ingredients: [\n        {\n          ingredient: 'Mascarpone',\n          quantity: '250',\n          unityOfMeasure: 'gr',\n        },\n        {\n          ingredient: 'Ricotta',\n          quantity: '250',\n          unityOfMeasure: 'gr',\n        },\n        {\n          ingredient: 'Vanillina',\n          quantity: '1',\n          unityOfMeasure: 'bustina',\n        },\n        {\n          ingredient: 'Zucchero',\n          quantity: '80',\n          unityOfMeasure: 'gr',\n        },\n        {\n          ingredient: 'Uova',\n          quantity: '3',\n        },\n        {\n          ingredient: 'Marmellata',\n          note: 'preferibilmente rossa',\n          quantity: '1 e mezzo',\n          unityOfMeasure: 'barattolo',\n        },\n        {\n          ingredient: 'Biscotti',\n          note: 'Tipo Rigoli Mulino Bianco',\n          quantity: '240',\n          unityOfMeasure: 'gr',\n        },\n        {\n          ingredient: 'Farina',\n          quantity: '1/5',\n          unityOfMeasure: 'cucchiaio',\n        },\n        {\n          ingredient: 'Burro',\n          quantity: '125',\n          unityOfMeasure: 'gr',\n        },\n      ],\n      intro: 'Un dolce buonissimo, semplice e veloce da preparare.',\n      portions: '6',\n      preparationTime: '20 minuti',\n      title: 'Cheese cake',\n    },\n  },\n})"
+                "type": "",
+                "defaultValue": "Template.bind({})"
             },
             {
                 "name": "Default",
@@ -3393,11 +3381,21 @@
                 "name": "Template",
                 "ctype": "miscellaneous",
                 "subtype": "variable",
+                "file": "src/app/recipe-detail/recipe-detail.stories.ts",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "type": "Story",
+                "defaultValue": "(args: RecipeDetailComponent) => ({\n  props: {\n    label: 'RecipeDetailComponent',\n    ...args,\n  },\n})"
+            },
+            {
+                "name": "Template",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
                 "file": "src/app/recipe-item/recipe-item.stories.ts",
                 "deprecated": false,
                 "deprecationMessage": "",
                 "type": "Story",
-                "defaultValue": "(args: RecipeItemComponent) => ({\n  props: {\n    label: 'RecipeItemComponent',\n    recipe: {\n      author: {\n        email: 'dave.catani@gmail.com',\n        id: '1',\n        name: 'Davide Catani',\n      },\n      category: 'Frutta e dolci',\n      cookingTime: '30 minuti',\n      date: '2017-02-26 20:50:13',\n      description:\n        \"Sciogliere il burro in un pentolino.\\nTritare i biscotti e unire il tutto.\\nVersare in una teglia e formare una base compatta e uniforme.\\nFrullare il resto degli ingredienti e versarli sopra la base di biscotti.\\nCuocere in forno per mezz'ora circa a 180° finchè non diventa solida.\\nLasciar sfreddare e ricoprire di marmellata.\\n\",\n      difficulty: 'facile',\n      id: '240',\n      imageName: 'Cheese_Cake.jpg',\n      ingredients: [\n        {\n          ingredient: 'Mascarpone',\n          quantity: '250',\n          unityOfMeasure: 'gr',\n        },\n        {\n          ingredient: 'Ricotta',\n          quantity: '250',\n          unityOfMeasure: 'gr',\n        },\n        {\n          ingredient: 'Vanillina',\n          quantity: '1',\n          unityOfMeasure: 'bustina',\n        },\n        {\n          ingredient: 'Zucchero',\n          quantity: '80',\n          unityOfMeasure: 'gr',\n        },\n        {\n          ingredient: 'Uova',\n          quantity: '3',\n        },\n        {\n          ingredient: 'Marmellata',\n          note: 'preferibilmente rossa',\n          quantity: '1 e mezzo',\n          unityOfMeasure: 'barattolo',\n        },\n        {\n          ingredient: 'Biscotti',\n          note: 'Tipo Rigoli Mulino Bianco',\n          quantity: '240',\n          unityOfMeasure: 'gr',\n        },\n        {\n          ingredient: 'Farina',\n          quantity: '1/5',\n          unityOfMeasure: 'cucchiaio',\n        },\n        {\n          ingredient: 'Burro',\n          quantity: '125',\n          unityOfMeasure: 'gr',\n        },\n      ],\n      intro: 'Un dolce buonissimo, semplice e veloce da preparare.',\n      portions: '6',\n      preparationTime: '20 minuti',\n      title: 'Cheese cake',\n    },\n  },\n})"
+                "defaultValue": "(args: RecipeItemComponent) => ({\n  props: {\n    label: 'RecipeItemComponent',\n    ...args,\n  },\n})"
             },
             {
                 "name": "UPDATE_RECIPE",
@@ -3773,8 +3771,18 @@
                     "file": "src/app/recipe-detail/recipe-detail.stories.ts",
                     "deprecated": false,
                     "deprecationMessage": "",
+                    "type": "",
+                    "defaultValue": "Template.bind({})"
+                },
+                {
+                    "name": "Template",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/recipe-detail/recipe-detail.stories.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
                     "type": "Story",
-                    "defaultValue": "() => ({\n  props: {\n    label: 'RecipeDetailComponent',\n    recipe: {\n      author: {\n        email: 'dave.catani@gmail.com',\n        id: '1',\n        name: 'Davide Catani',\n      },\n      category: 'Frutta e dolci',\n      cookingTime: '30 minuti',\n      date: '2017-02-26 20:50:13',\n      description:\n        \"Sciogliere il burro in un pentolino.\\nTritare i biscotti e unire il tutto.\\nVersare in una teglia e formare una base compatta e uniforme.\\nFrullare il resto degli ingredienti e versarli sopra la base di biscotti.\\nCuocere in forno per mezz'ora circa a 180° finchè non diventa solida.\\nLasciar sfreddare e ricoprire di marmellata.\\n\",\n      difficulty: 'facile',\n      id: '240',\n      imageName: 'Cheese_Cake.jpg',\n      ingredients: [\n        {\n          ingredient: 'Mascarpone',\n          quantity: '250',\n          unityOfMeasure: 'gr',\n        },\n        {\n          ingredient: 'Ricotta',\n          quantity: '250',\n          unityOfMeasure: 'gr',\n        },\n        {\n          ingredient: 'Vanillina',\n          quantity: '1',\n          unityOfMeasure: 'bustina',\n        },\n        {\n          ingredient: 'Zucchero',\n          quantity: '80',\n          unityOfMeasure: 'gr',\n        },\n        {\n          ingredient: 'Uova',\n          quantity: '3',\n        },\n        {\n          ingredient: 'Marmellata',\n          note: 'preferibilmente rossa',\n          quantity: '1 e mezzo',\n          unityOfMeasure: 'barattolo',\n        },\n        {\n          ingredient: 'Biscotti',\n          note: 'Tipo Rigoli Mulino Bianco',\n          quantity: '240',\n          unityOfMeasure: 'gr',\n        },\n        {\n          ingredient: 'Farina',\n          quantity: '1/5',\n          unityOfMeasure: 'cucchiaio',\n        },\n        {\n          ingredient: 'Burro',\n          quantity: '125',\n          unityOfMeasure: 'gr',\n        },\n      ],\n      intro: 'Un dolce buonissimo, semplice e veloce da preparare.',\n      portions: '6',\n      preparationTime: '20 minuti',\n      title: 'Cheese cake',\n    },\n  },\n})"
+                    "defaultValue": "(args: RecipeDetailComponent) => ({\n  props: {\n    label: 'RecipeDetailComponent',\n    ...args,\n  },\n})"
                 }
             ],
             "src/app/recipe-item/recipe-item.stories.ts": [
@@ -3796,7 +3804,7 @@
                     "deprecated": false,
                     "deprecationMessage": "",
                     "type": "Story",
-                    "defaultValue": "(args: RecipeItemComponent) => ({\n  props: {\n    label: 'RecipeItemComponent',\n    recipe: {\n      author: {\n        email: 'dave.catani@gmail.com',\n        id: '1',\n        name: 'Davide Catani',\n      },\n      category: 'Frutta e dolci',\n      cookingTime: '30 minuti',\n      date: '2017-02-26 20:50:13',\n      description:\n        \"Sciogliere il burro in un pentolino.\\nTritare i biscotti e unire il tutto.\\nVersare in una teglia e formare una base compatta e uniforme.\\nFrullare il resto degli ingredienti e versarli sopra la base di biscotti.\\nCuocere in forno per mezz'ora circa a 180° finchè non diventa solida.\\nLasciar sfreddare e ricoprire di marmellata.\\n\",\n      difficulty: 'facile',\n      id: '240',\n      imageName: 'Cheese_Cake.jpg',\n      ingredients: [\n        {\n          ingredient: 'Mascarpone',\n          quantity: '250',\n          unityOfMeasure: 'gr',\n        },\n        {\n          ingredient: 'Ricotta',\n          quantity: '250',\n          unityOfMeasure: 'gr',\n        },\n        {\n          ingredient: 'Vanillina',\n          quantity: '1',\n          unityOfMeasure: 'bustina',\n        },\n        {\n          ingredient: 'Zucchero',\n          quantity: '80',\n          unityOfMeasure: 'gr',\n        },\n        {\n          ingredient: 'Uova',\n          quantity: '3',\n        },\n        {\n          ingredient: 'Marmellata',\n          note: 'preferibilmente rossa',\n          quantity: '1 e mezzo',\n          unityOfMeasure: 'barattolo',\n        },\n        {\n          ingredient: 'Biscotti',\n          note: 'Tipo Rigoli Mulino Bianco',\n          quantity: '240',\n          unityOfMeasure: 'gr',\n        },\n        {\n          ingredient: 'Farina',\n          quantity: '1/5',\n          unityOfMeasure: 'cucchiaio',\n        },\n        {\n          ingredient: 'Burro',\n          quantity: '125',\n          unityOfMeasure: 'gr',\n        },\n      ],\n      intro: 'Un dolce buonissimo, semplice e veloce da preparare.',\n      portions: '6',\n      preparationTime: '20 minuti',\n      title: 'Cheese cake',\n    },\n  },\n})"
+                    "defaultValue": "(args: RecipeItemComponent) => ({\n  props: {\n    label: 'RecipeItemComponent',\n    ...args,\n  },\n})"
                 }
             ],
             "src/environments/environment.prod.ts": [
@@ -4429,12 +4437,22 @@
                 "status": "low"
             },
             {
+                "filePath": "src/app/recipe-detail/recipe-detail.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Template",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
                 "filePath": "src/app/recipe-item/recipe-item.component.ts",
                 "type": "component",
                 "linktype": "component",
                 "name": "RecipeItemComponent",
                 "coveragePercent": 0,
-                "coverageCount": "0/7",
+                "coverageCount": "0/6",
                 "status": "low"
             },
             {
